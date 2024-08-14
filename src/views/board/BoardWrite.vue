@@ -20,85 +20,85 @@
 </template>
 
 <script>
-export default {
-  data() { //변수생성
-    return {
-      requestBody: this.$route.query,
-      id: this.$route.query.id,
+  export default {
+    data() { //변수생성
+      return {
+        requestBody: this.$route.query,
+        id: this.$route.query.id,
 
-      title: '',
-      author: '',
-      contents: '',
-      created_at: ''
-    }
-  },
-  mounted() {
-    this.fnGetView()
-  },
-  methods: {
-    fnGetView() {
-      if (this.id !== undefined) {
-        this.$axios.get(this.$serverUrl + '/board/' + this.id, {
-          params: this.requestBody
-        }).then((res) => {
-          this.title = res.data.title
-          this.author = res.data.author
-          this.contents = res.data.contents
-          this.created_at = res.data.created_at
-        }).catch((err) => {
-          console.log(err)
-        })
+        title: '',
+        author: '',
+        contents: '',
+        created_at: ''
       }
     },
-    fnList() {
-      delete this.requestBody.id
-      this.$router.push({
-        path: './list',
-        query: this.requestBody
-      })
+    mounted() {
+      this.fnGetView()
     },
-    fnView(id) {
-      this.requestBody.id = id
-      this.$router.push({
-        path: './detail',
-        query: this.requestBody
-      })
-    },
-    fnSave() {
-      let apiUrl = this.$serverUrl + '/board'
-      this.form = {
-        "id": this.id,
-        "title": this.title,
-        "contents": this.contents,
-        "author": this.author
-      }
+    methods: {
+      fnGetView() {
+        if (this.id !== undefined) {
+          this.$axios.get(this.$serverUrl + '/boards/' + this.id, {
+            params: this.requestBody
+          }).then((res) => {
+            this.title = res.data.title
+            this.author = res.data.author
+            this.contents = res.data.contents
+            this.created_at = res.data.created_at
+          }).catch((err) => {
+            console.log(err)
+          })
+        }
+      },
+      fnList() {
+        delete this.requestBody.id
+        this.$router.push({
+          path: './list',
+          query: this.requestBody
+        })
+      },
+      fnView(id) {
+        this.requestBody.id = id
+        this.$router.push({
+          path: './detail',
+          query: this.requestBody
+        })
+      },
+      fnSave() {
+        let apiUrl = this.$serverUrl + '/boards'
+        this.form = {
+          "id": this.id,
+          "title": this.title,
+          "contents": this.contents,
+          "author": this.author
+        }
 
-      if (this.id === undefined) {
-        //INSERT
-        this.$axios.post(apiUrl, this.form)
-        .then((res) => {
-          alert('글이 저장되었습니다.')
-          this.fnView(res.data.id)
-        }).catch((err) => {
-          if (err.message.indexOf('Network Error') > -1) {
-            alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
-          }
-        })
-      } else {
-        //UPDATE
-        this.$axios.patch(apiUrl, this.form)
-        .then((res) => {
-          alert('글이 저장되었습니다.')
-          this.fnView(res.data.id)
-        }).catch((err) => {
-          if (err.message.indexOf('Network Error') > -1) {
-            alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
-          }
-        })
+        if (this.id === undefined) {
+          //INSERT
+          this.$axios.post(apiUrl, this.form)
+            .then((res) => {
+              alert('글이 저장되었습니다.')
+              this.fnView(res.data.id)
+            }).catch((err) => {
+              if (err.message.indexOf('Network Error') > -1) {
+                alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
+              }
+            })
+        } else {
+          //UPDATE
+          this.$axios.patch(apiUrl + '/' + this.id, this.form)
+            .then((res) => {
+              alert('글이 저장되었습니다.')
+              this.fnView(res.data.id)
+            }).catch((err) => {
+              if (err.message.indexOf('Network Error') > -1) {
+                alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
+              }
+            })
+        }
       }
     }
   }
-}
 </script>
 <style scoped>
 

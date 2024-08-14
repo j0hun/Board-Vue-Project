@@ -25,62 +25,62 @@
 </template>
 
 <script>
-export default {
-  data() { //변수생성
-    return {
-      requestBody: this.$route.query,
-      id: this.$route.query.id,
+  export default {
+    data() { //변수생성
+      return {
+        requestBody: this.$route.query,
+        id: this.$route.query.id,
 
-      title: '',
-      author: '',
-      contents: '',
-      created_at: ''
-    }
-  },
-  mounted() {
-    this.fnGetView()
-  },
-  methods: {
-    fnGetView() {
-      this.$axios.get(this.$serverUrl + '/boards/' + this.id, {
-        params: this.requestBody
-      }).then((res) => {
-        this.title = res.data.title
-        this.author = res.data.author
-        this.contents = res.data.contents
-        this.created_at = res.data.created_at
-      }).catch((err) => {
-        if (err.message.indexOf('Network Error') > -1) {
-          alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
-        }
-      })
+        title: '',
+        author: '',
+        contents: '',
+        created_at: ''
+      }
     },
-    fnList() {
-      delete this.requestBody.id
-      this.$router.push({
-        path: './list',
-        query: this.requestBody
-      })
+    mounted() {
+      this.fnGetView()
     },
-    fnUpdate() {
-      this.$router.push({
-        path: './write',
-        query: this.requestBody
-      })
-    },
-    fnDelete() {
-      if (!confirm("삭제하시겠습니까?")) return
+    methods: {
+      fnGetView() {
+        this.$axios.get(this.$serverUrl + '/boards/' + this.id, {
+          params: this.requestBody
+        }).then((res) => {
+          this.title = res.data.title
+          this.author = res.data.author
+          this.contents = res.data.contents
+          this.created_at = res.data.created_at
+        }).catch((err) => {
+          if (err.message.indexOf('Network Error') > -1) {
+            alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
+          }
+        })
+      },
+      fnList() {
+        delete this.requestBody.id
+        this.$router.push({
+          path: './list',
+          query: this.requestBody
+        })
+      },
+      fnUpdate() {
+        this.$router.push({
+          path: './write',
+          query: this.requestBody
+        })
+      },
+      fnDelete() {
+        if (!confirm("삭제하시겠습니까?")) return
 
-      this.$axios.delete(this.$serverUrl + '/boards/' + this.id, {})
+        this.$axios.delete(this.$serverUrl + '/boards/' + this.id, {})
           .then(() => {
             alert('삭제되었습니다.')
             this.fnList();
           }).catch((err) => {
-        console.log(err);
-      })
+            console.log(err);
+          })
+      }
     }
   }
-}
 </script>
 <style scoped>
 
