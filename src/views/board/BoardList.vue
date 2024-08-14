@@ -24,10 +24,12 @@
     <div class="pagination w3-bar w3-padding-16 w3-small" v-if="paging.totalElements > 0">
       <span class="pg">
         <!-- << Button -->
-        <a href="javascript:;" @click="fnPage(firstPage() - 10)" class="first w3-button w3-bar-item w3-border" :class="{ disabled: firstPage() <= 1 }">&lt;&lt;</a>
+        <a href="javascript:;" @click="fnPage(firstPage() - 10)" class="first w3-button w3-bar-item w3-border"
+          :class="{ disabled: firstPage() <= 1 }">&lt;&lt;</a>
         <!-- < Button -->
-        <a href="javascript:;" @click="fnPage(paging.number - 1)" class="prev w3-button w3-bar-item w3-border" :class="{ disabled: paging.number <= 0 }">&lt;</a>
-        
+        <a href="javascript:;" @click="fnPage(paging.number - 1)" class="prev w3-button w3-bar-item w3-border"
+          :class="{ disabled: paging.number <= 0 }">&lt;</a>
+
         <!-- Page Number Buttons -->
         <template v-for="n in paginavigation()">
           <template v-if="paging.number === n">
@@ -39,11 +41,24 @@
         </template>
 
         <!-- > Button -->
-        <a href="javascript:;" @click="fnPage(paging.number + 1)" class="next w3-button w3-bar-item w3-border" :class="{ disabled: paging.number >= paging.totalPages - 1 }">&gt;</a>
+        <a href="javascript:;" @click="fnPage(paging.number + 1)" class="next w3-button w3-bar-item w3-border"
+          :class="{ disabled: paging.number >= paging.totalPages - 1 }">&gt;</a>
 
         <!-- >> Button -->
-        <a href="javascript:;" @click="fnPage(firstPage() + 10)" class="last w3-button w3-bar-item w3-border" :class="{ disabled: firstPage() + 10 > paging.totalPages }">&gt;&gt;</a>
+        <a href="javascript:;" @click="fnPage(firstPage() + 10)" class="last w3-button w3-bar-item w3-border"
+          :class="{ disabled: firstPage() + 10 > paging.totalPages }">&gt;&gt;</a>
       </span>
+    </div>
+    <div>
+      <select v-model="searchKey">
+        <option value="">- 선택 -</option>
+        <option value="author">작성자</option>
+        <option value="title">제목</option>
+      </select>
+      &nbsp;
+      <input type="text" v-model="searchValue" @keyup.enter="fnGetList()">
+      &nbsp;
+      <button @click="fnGetList()">검색</button>
     </div>
   </div>
 </template>
@@ -63,12 +78,13 @@
         },
         page: this.$route.query.page ? parseInt(this.$route.query.page) : 1,
         size: this.$route.query.size ? parseInt(this.$route.query.size) : 10,
-        keyword: this.$route.query.keyword,
+        searchKey: this.$route.query.searchKey ? this.$route.query.searchKey : '',
+        searchValue: this.$route.query.searchValue ? this.$route.query.searchValue : '',
         paginavigation: function () {
           let pageNumber = [];
           let totalPages = this.paging.totalPages;
           let currentPage = this.paging.number + 1; // 1-based index for current page
-          
+
           // Determine start and end page for pagination
           let startPage = Math.max(1, Math.floor((currentPage - 1) / 10) * 10 + 1);
           let endPage = Math.min(totalPages, startPage + 9);
@@ -90,7 +106,8 @@
     methods: {
       fnGetList() {
         this.requestBody = {
-          keyword: this.keyword,
+          searchKey: this.searchKey,
+          searchValue: this.searchValue,
           page: this.page - 1, // API 요청은 0-based index로 페이지를 요구할 수 있음
           size: this.size
         }
@@ -98,6 +115,7 @@
           params: this.requestBody,
           headers: {}
         }).then((res) => {
+          console.log(this.searchKey)
           if (res.data != null) {
             this.list = res.data.content
             this.paging.number = res.data.number; // 현재 페이지 번호 (0-based index)
